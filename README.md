@@ -68,6 +68,8 @@ console.log(age);
 // Debug the console
 ```
 
+-----
+
 # Fundamentals
 ![img.png](imgs/FundContent.png)
 
@@ -202,6 +204,7 @@ employee.id = 0; // Error: Cannot assign to 'id' because it is a read-only prope
   3. Overrall structure is hard to readable.
 
 Where we use type alias.
+
 
 # Advanced Types
 
@@ -611,5 +614,329 @@ let x = foo ?? bar();
 let value: unknown = 'a'; 
 if (typeof value === 'string') // This line need to be here
     console.log(value.toUpperCase()); 
+
+```
+
+----
+
+
+# Object Oriented Programming 
+
+![img.png](imgs/OOPCont1.png)
+![img.png](imgs/OOPCont2.png)
+
+Ways of writing code
+![img.png](imgs/Paradigms.png)
+
+## Classes
+![img.png](imgs/Class.png)
+
+- Class is a blueprint for creating objects.
+- Class Naming Convention: PascalCase
+- Constructor is always return instance of the class.
+
+```typescript
+class Account {
+    // define properties
+    id: number;
+    name: string;
+    balance: number;
+
+    // define constructor
+    constructor(id: number,name: string, balance: number) {
+        this.id = id;
+        this.name = name;
+        this.balance = balance;
+    }
+
+    // define method
+    deposit(amount: number): void {
+        if ( amount < 0 )
+            throw new Error ("Invalid amount");
+        this.balance += amount;
+    }
+}
+```
+
+```js
+class Account {
+    constructor(id, name, balance) {
+        this.id = id;
+        this.name = name;
+        this.balance = balance;
+    }
+    deposit(amount) {
+        if (amount < 0)
+            throw new Error("Invalid amount");
+        this.balance += amount;
+    }
+}
+//# sourceMappingURL=index.js.map
+```
+
+## Creating Objects
+
+```typescript
+let account  = new Account(1, "Aashik", 0)
+account.deposit(100);
+
+console.log(account.balance) // 100
+console.log(typeof account); // object
+
+console.log(account) // Object
+// Check if the object is an instance of the class
+console.log(account instanceof Account); // true
+```
+
+# Read Only and Optional Properties
+
+In the bank account, we cannot change the id of the account. It will make the bug in the function.
+SO, have to put readonly, we provide nickname as new property and put as optional.
+
+```ts
+class Account {
+    readonly id: number;
+    name: string;
+    balance: number;
+    nickname?: string
+
+    constructor(id: number,name: string, balance: number) {
+        this.id = id;
+        this.name = name;
+        this.balance = balance;
+    }
+
+    deposit(amount: number): void {
+        // account.id = 2; // Error: Cannot assign to 'id' because it is a read-only property
+        if ( amount < 0 )
+            throw new Error ("Invalid amount");
+        this.balance += amount;
+    }
+}
+
+let account  = new Account(1, "Aashik", 0)
+account.deposit(100);
+
+console.log(account.balance) // 100
+console.log(typeof account); // object
+
+
+```
+
+## Access Modifiers
+
+![img.png](imgs/AccessModif.png)
+
+So I need to record a transaction, when I put the amount in the account.
+
+
+```ts
+class Account {
+    readonly id: number;
+    name: string;
+    private _balance: number;
+    nickname?: string
+
+    constructor(id: number,name: string, balance: number) {
+        this.id = id;
+        this.name = name;
+        this._balance = balance;
+    }
+
+    deposit(amount: number): void {
+        // account.id = 2; // Error: Cannot assign to 'id' because it is a read-only property
+        if ( amount < 0 )
+            throw new Error ("Invalid amount");
+        this._balance += amount;
+    }
+    
+    // gonna use this within class. not outside
+    private calculateTax(){
+
+    }
+    
+    getBalance(): number{
+        return this._balance;
+    }
+}
+
+let account  = new Account(1, "Aashik", 0)
+account.deposit(100);
+console.log(account.getBalance()); // 100
+
+```
+
+
+## Parameter Properties
+
+Parameter properties in TypeScript provide a shorthand way to declare and initialize class properties directly in the constructor parameters. This reduces boilerplate code and makes the class definition more concise.
+
+In this example, the **Account** class uses parameter properties to declare and initialize id, name, _balance, and nickname directly in the constructor. This eliminates the need to separately declare these properties and assign them in the constructor body.
+
+```ts
+class Account {
+    constructor(public readonly id: number,
+                public name: string,
+                private _balance: number,
+                public nickname?: string) {
+    }
+
+
+    deposit(amount: number): void {
+        if ( amount < 0 ) throw new Error ("Invalid amount");
+        this._balance += amount;
+    }
+
+    getBalance(): number{
+        return this._balance;
+    }
+}
+
+const account = new Account(1, "John", 100, "Doe");
+```
+
+## Getters and setters
+
+Getters and setters in TypeScript are special methods that provide a way to access and update the properties of a class. They allow you to control how a property is accessed and modified, adding encapsulation and validation logic.
+
+Instead of using getBalance() method, we can use getter and setter.
+
+```ts
+class Account {
+
+    constructor(public readonly id: number, public name: string,private _balance: number) {
+    }
+
+    // Getter for balance
+    get balance():number  {
+        return this._balance;
+    }
+
+    // Setter for balance
+    set balance(value: number){
+        if (value < 0) throw new Error("Invalid balance");
+        this._balance = value;
+    }
+
+    deposit(amount: number): void {
+        if (amount < 0) {
+            throw new Error("Invalid amount");
+        }
+        this._balance += amount;
+    }
+}
+
+let account = new Account(1, "Aashik", 100);
+console.log(account.balance); // 100
+
+account.deposit(50);
+console.log(account.balance); // 150
+
+account.balance = 200;
+console.log(account.balance); // 200
+
+// account.balance = -50; // Error: Invalid amount
+```
+
+## Index Signatures
+
+Index signature properties in TypeScript allow you to define properties with dynamic keys. This is useful when you don't know the exact property names ahead of time but you know the type of the values
+
+```ts
+// let person = {
+// }
+// person.name = "Aashik";
+// console.log(person)
+
+class SeatAssignment {
+    // A1, A2, ....
+    // Mosh, Jhon, ...
+    // A1: string,
+    // Index Signature Property
+    [seatNumber: string] : string
+}
+
+let seats = new SeatAssignment();
+seats.A1 = "Mosh"
+// seats[A1] = "Mosh"
+// seats.A2 = 1; // Error - Type 'number' is not assignable to type 'string'.
+seats.A2 = "Jhon";
+
+console.log(seats)
+
+```
+
+## Static members
+
+Static members in TypeScript are properties and methods of a class that belong to the class itself rather than to instances of the class. They are accessed using the class name rather than an instance of the class.
+
+Ex1:
+```ts
+class MathUtil {
+    // Static property
+    static PI: number = 3.14;
+
+    // Static method
+    static calculateCircumference(radius: number): number {
+        return 2 * MathUtil.PI * radius;
+    }
+}
+
+// Accessing static property
+console.log(MathUtil.PI); // 3.14
+
+// Calling static method
+console.log(MathUtil.calculateCircumference(10)); // 62.8
+```
+
+In this example, PI is a static property and calculateCircumference is a static method. They are accessed using the class name MathUtil rather than an instance of the class.
+
+Ex2:
+```ts
+class Ride {
+    activeRides: number = 0;
+
+    start(){this.activeRides++;}
+    stop(){this.activeRides--;}
+}
+
+let ride1 = new Ride();
+ride1.start();
+
+let ride2 = new Ride();
+ride2.start();
+
+console.log(ride1.activeRides); // 
+console.log(ride2.activeRides); //
+
+// But here we need 2 right, so we need to make activeRides as static.
+
+
+```
+--
+
+```ts
+class Ride {
+    private static _activeRides: number = 0;
+
+    start(){Ride._activeRides++;}
+    stop(){Ride._activeRides--;}
+
+    static get activeRides(){
+        return Ride._activeRides;
+    }
+}
+
+// This is can't be happen logically. so we need to make it private.
+// Ride._activeRides = 10;
+
+let ride1 = new Ride();
+ride1.start();
+
+let ride2 = new Ride();
+ride2.start();
+
+console.log(Ride.activeRides); //
+
 
 ```
