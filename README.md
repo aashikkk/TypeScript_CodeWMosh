@@ -1,3 +1,39 @@
+# Table of Contents
+1. [Fundamentals](#fundamentals)
+   1. [Build-in Types](#built-in-types)
+   2. [Any Types](#any-types)
+   3. [Arrays](#arrays)
+   4. [Tuples](#tuples)
+   5. [Enums](#enums)
+   6. [Functions](#functions)
+   7. [Objects](#objects)
+2. [Advanced Types](#advanced-types)
+   1. [Union Types](#union-types)
+   2. [Intersection Types](#intersection-types)
+   3. [Literal Types](#literal-types)
+   4. [Nullable Types](#nullable-types)
+   5. [Optional Types](#optional-types)
+   6. [Nullish Coalescing Operator](#nullish-coalescing-operator)
+   7. [Type Assertions](#type-assertions)
+   8. [Unknown Types](#unknown-types)
+   9. [Never Type](#never-type)
+3. [Object Oriented Programming](#object-oriented-programming)
+   1. [Classes](#classes)
+   2. [Creating Objects](#creating-objects)
+   3. [Read Only and Optional Properties](#read-only-and-optional-properties)
+   4. [Access Modifiers](#access-modifiers)
+   5. [Parameter Properties](#parameter-properties)
+   6. [Getters and setters](#getters-and-setters)
+   7. [Index Signatures](#index-signatures)
+   8. [Static members](#static-members)
+   9. [Inheritance](#inheritance)
+   10. [Method overriding](#method-overriding)
+   11. [Polymorphism](#polymorphism)
+   12. [Open-Closed Principle](#open-closed-principle)
+   13. [SOLID Principles](#solid-principles)
+   14. [Private and Protected Members](#private-and-protected-members)
+   
+
 # TypeScript
 
 TypeScript is built top on JavaScript.
@@ -688,7 +724,7 @@ console.log(account) // Object
 console.log(account instanceof Account); // true
 ```
 
-# Read Only and Optional Properties
+## Read Only and Optional Properties
 
 In the bank account, we cannot change the id of the account. It will make the bug in the function.
 SO, have to put readonly, we provide nickname as new property and put as optional.
@@ -940,3 +976,746 @@ console.log(Ride.activeRides); //
 
 
 ```
+
+## Inheritance
+
+Inheritance in TypeScript allows you to create a new class (derived class) based on an existing class (base class). The derived class inherits properties and methods from the base class, allowing you to reuse code and create a hierarchy of classes.
+
+- We dont want to create two separate clases that have same properties and methods. So, we can use inheritance.
+
+![img.png](imgs/Inher1.png)
+![img_1.png](imgs/Inher2.png)
+
+```ts
+class Person {
+    constructor(public firstName: string, public lastName: string) {
+    }
+
+    get fullName() {
+        return this.firstName + " " + this.lastName;
+    }
+
+    walk() {
+        console.log("Walking");
+    }
+}
+
+class Student extends Person {
+    constructor(public studentId: number, firstName: string, lastName: string) {
+        super(firstName, lastName);
+    }
+    
+    takeTest() {
+        console.log("Taking a test");
+    }
+}
+```
+
+We dont need to define again like `public firstName: string, public lastName: string` in the Student class. We can use the super keyword to call the constructor of the base class.
+Just need to add `firstName and lastName` in the constructor.
+
+
+![img.png](imgs/Inher3.png)
+
+## Method overriding
+
+```ts
+class Person {
+    constructor(public firstName: string, public lastName: string) {
+     }
+
+     get fullName(){
+        return this.firstName + " " + this.lastName;
+     }
+
+     walk(){
+         console.log("Walking...")
+     }
+}
+
+class Student extends Person {
+    constructor(public studentId: number, firstName: string, lastName: string) {
+        super(firstName, lastName);
+    }
+
+    takeTest(){
+        console.log("Taking test...")
+    }
+}
+
+class Teacher extends Person {
+    override get fullName(){
+        // We don't need this.firstName + " " + this.lastName; since we already have in base class
+        // return "Professor" + this.firstName + " " + this.lastName;
+        // it will work without override too. but there is a minor issue with that.
+        return "Professor " + super.fullName;
+    }
+}
+
+let teacher = new Teacher("John", "Doe");
+console.log(teacher.fullName)
+
+```
+
+         "noImplicitOverride": true,                       /* Ensure overriding members in derived classes are marked with an override modifier. */
+
+
+## Polymorphism
+// Many forms -  Object can take many different forms
+
+Polymorphism in TypeScript allows you to use a single interface or base class to represent multiple derived classes. This enables you to write code that works with objects of different types without knowing the specific type at compile time.
+
+```ts
+class Person {
+    constructor(public firstName: string, public lastName: string) {
+     }
+
+     get fullName(){
+        return this.firstName + " " + this.lastName;
+     }
+
+     walk(){
+         console.log("Walking...")
+     }
+}
+
+class Student extends Person {
+    constructor(public studentId: number, firstName: string, lastName: string) {
+        super(firstName, lastName);
+    }
+
+    takeTest(){
+        console.log("Taking test...")
+    }
+}
+
+class Teacher extends Person {
+    override get fullName(){
+        return "Professor " + super.fullName;
+    }
+}
+
+class Principal extends Person {
+    override get fullName(){
+        return "Principal " + super.fullName;
+    }
+}
+
+printNames([
+    new Student(1, "John", "Doe"),
+    new Teacher("Mosh", "Hamedani"),
+    new Principal("Adam", "Smith")
+])
+
+function printNames(people: Person[]){
+    for (let person of people)
+        console.log(person.fullName);
+}
+
+// here the person is Person class type, so it can be Student or Teacher or principals. This is how polymorphism works here.
+```
+
+Polymorphism allows objects of different classes to be treated as objects of a common base class. In this example, Student, Teacher, and Principal all extend the Person class. The printNames function accepts an array of Person objects, but it can handle Student, Teacher, and Principal objects because they all inherit from Person.  When printNames is called, it iterates over the array of Person objects and calls the fullName getter on each one. Due to polymorphism, the correct fullName method is called based on the actual type of the object (i.e., Student, Teacher, or Principal), even though the function only knows that it is dealing with Person objects
+
+- new Student(1, "John", "Doe") creates a Student object.
+- new Teacher("Mosh", "Hamedani") creates a Teacher object.
+- new Principal("Adam", "Smith") creates a Principal object.
+
+The printNames function treats all these objects as Person objects and calls their fullName method, demonstrating polymorphism
+
+Without changing this, we are adding new classes. By this we achieve Open-Closed Principle.
+
+```ts
+function printNames(people: Person[]){
+    for (let person of people)
+        console.log(person.fullName);
+}
+```
+
+![img.png](imgs/openClosedPr.png)
+
+## Open-Closed Principle
+
+The Open-Closed Principle (OCP) is one of the five SOLID principles of object-oriented design. It states that software entities (such as classes, modules, and functions) should be open for extension but closed for modification. This means that the behavior of a module can be extended without modifying its source code.
+
+### Key Points:
+- **Open for Extension**: You should be able to add new functionality to a class or module.
+- **Closed for Modification**: You should not change the existing code of a class or module.
+
+### Benefits:
+- **Maintainability**: Reduces the risk of introducing bugs when adding new features.
+- **Scalability**: Makes it easier to extend the system with new functionality.
+- **Flexibility**: Encourages the use of interfaces and abstract classes to allow for flexible and reusable code.
+
+### Example:
+
+Consider a `Person` class and its subclasses `Student`, `Teacher`, and `Principal`. The `printNames` function demonstrates the Open-Closed Principle by allowing new types of `Person` to be added without modifying the function itself.
+
+```typescript
+class Person {
+    constructor(public firstName: string, public lastName: string) {}
+
+    get fullName(): string {
+        return this.firstName + " " + this.lastName;
+    }
+}
+
+class Student extends Person {
+    constructor(public studentId: number, firstName: string, lastName: string) {
+        super(firstName, lastName);
+    }
+}
+
+class Teacher extends Person {
+    override get fullName(): string {
+        return "Professor " + super.fullName;
+    }
+}
+
+class Principal extends Person {
+    override get fullName(): string {
+        return "Principal " + super.fullName;
+    }
+}
+
+function printNames(people: Person[]): void {
+    for (let person of people) {
+        console.log(person.fullName);
+    }
+}
+
+printNames([
+    new Student(1, "John", "Doe"),
+    new Teacher("Mosh", "Hamedani"),
+    new Principal("Adam", "Smith")
+]);
+```
+
+In this example, the `printNames` function can handle new subclasses of `Person` without any changes, adhering to the Open-Closed Principle.
+
+**SO, THE TAKEAWAY IS POLYMORPHISM IS ALLOW US TO FOLLOW THIS(open/close) GUIDELINE.**
+
+## SOLID Principles
+
+The SOLID principles are a set of five design principles in object-oriented programming that help developers create more maintainable, understandable, and flexible software. These principles were introduced by Robert C. Martin, also known as Uncle Bob.
+
+### S - Single Responsibility Principle (SRP)
+A class should have only one reason to change, meaning it should have only one job or responsibility.
+
+### O - Open/Closed Principle (OCP)
+Software entities (classes, modules, functions, etc.) should be open for extension but closed for modification. This means you should be able to add new functionality without changing existing code.
+
+### L - Liskov Substitution Principle (LSP)
+Objects of a superclass should be replaceable with objects of a subclass without affecting the correctness of the program. Subtypes must be substitutable for their base types.
+
+### I - Interface Segregation Principle (ISP)
+Clients should not be forced to depend on interfaces they do not use. Instead of one large interface, many small, specific interfaces are preferred.
+
+### D - Dependency Inversion Principle (DIP)
+High-level modules should not depend on low-level modules. Both should depend on abstractions. Abstractions should not depend on details. Details should depend on abstractions.
+
+### Benefits of SOLID Principles
+- **Maintainability**: Easier to maintain and understand the code.
+- **Scalability**: Facilitates adding new features without breaking existing functionality.
+- **Flexibility**: Encourages the use of interfaces and abstract classes for more flexible and reusable code.
+- **Testability**: Improves the ability to test code by promoting loose coupling and high cohesion.
+
+### Example
+
+
+
+### Single Responsibility Principle (SRP)
+
+A class should have only one reason to change, meaning it should have only one job or responsibility.
+
+```typescript
+class User {
+    constructor(public name: string, public email: string) {}
+}
+
+class UserRepository {
+    private users: User[] = [];
+
+    addUser(user: User) {
+        this.users.push(user);
+    }
+
+    getUser(email: string): User | undefined {
+        return this.users.find(user => user.email === email);
+    }
+}
+
+class UserService {
+    constructor(private userRepository: UserRepository) {}
+
+    registerUser(name: string, email: string) {
+        const user = new User(name, email);
+        this.userRepository.addUser(user);
+    }
+}
+```
+
+### Open/Closed Principle:
+
+```typescript
+class Person {
+    constructor(public firstName: string, public lastName: string) {}
+
+    get fullName(): string {
+        return this.firstName + " " + this.lastName;
+    }
+}
+
+class Student extends Person {
+    constructor(public studentId: number, firstName: string, lastName: string) {
+        super(firstName, lastName);
+    }
+}
+
+class Teacher extends Person {
+    override get fullName(): string {
+        return "Professor " + super.fullName;
+    }
+}
+
+class Principal extends Person {
+    override get fullName(): string {
+        return "Principal " + super.fullName;
+    }
+}
+
+function printNames(people: Person[]): void {
+    for (let person of people) {
+        console.log(person.fullName);
+    }
+}
+
+printNames([
+    new Student(1, "John", "Doe"),
+    new Teacher("Mosh", "Hamedani"),
+    new Principal("Adam", "Smith")
+]);
+```
+
+In this example, the `printNames` function can handle new subclasses of `Person` without any changes, adhering to the Open/Closed Principle.
+
+
+### Liskov Substitution Principle (LSP)
+
+Objects of a superclass should be replaceable with objects of a subclass without affecting the correctness of the program.
+
+```typescript
+class Bird {
+    fly() {
+        console.log("Flying");
+    }
+}
+
+class Duck extends Bird {
+    quack() {
+        console.log("Quacking");
+    }
+}
+
+class Penguin extends Bird {
+    fly() {
+        throw new Error("Penguins can't fly");
+    }
+
+    swim() {
+        console.log("Swimming");
+    }
+}
+
+function makeBirdFly(bird: Bird) {
+    bird.fly();
+}
+
+makeBirdFly(new Duck()); // Works fine
+makeBirdFly(new Penguin()); // Throws error
+```
+
+### Interface Segregation Principle (ISP)
+
+Clients should not be forced to depend on interfaces they do not use. Instead of one large interface, many small, specific interfaces are preferred.
+
+```typescript
+interface Printer {
+    print(document: string): void;
+}
+
+interface Scanner {
+    scan(document: string): void;
+}
+
+class AllInOnePrinter implements Printer, Scanner {
+    print(document: string) {
+        console.log("Printing: " + document);
+    }
+
+    scan(document: string) {
+        console.log("Scanning: " + document);
+    }
+}
+
+class SimplePrinter implements Printer {
+    print(document: string) {
+        console.log("Printing: " + document);
+    }
+}
+```
+
+### Dependency Inversion Principle (DIP)
+
+High-level modules should not depend on low-level modules. Both should depend on abstractions. Abstractions should not depend on details. Details should depend on abstractions.
+
+```typescript
+interface Database {
+    save(data: string): void;
+}
+
+class MySQLDatabase implements Database {
+    save(data: string) {
+        console.log("Saving data to MySQL database: " + data);
+    }
+}
+
+class UserService {
+    constructor(private database: Database) {}
+
+    saveUser(data: string) {
+        this.database.save(data);
+    }
+}
+
+const database = new MySQLDatabase();
+const userService = new UserService(database);
+userService.saveUser("User data");
+```
+
+## Private vs Protected Members
+
+Private is not inherited. Meanwhile, protected is inherited.
+
+```ts
+class Person {
+    constructor(public firstName: string, public lastName: string) {
+     }
+
+     get fullName(){
+        return this.firstName + " " + this.lastName;
+     }
+
+     protected walk(){
+         console.log("Walking...")
+     }
+}
+
+class Student extends Person {
+    constructor(public studentId: number, firstName: string, lastName: string) {
+        super(firstName, lastName);
+    }
+    
+    takeTest(){
+        this.walk(); // we can call walk here. but if we use private in walk, we cannot access it.
+        // use private when you know what you are doing exactly.
+        console.log("Taking test...")
+    }
+}
+
+
+
+```
+
+## Abstract classes and methods
+
+![img_1.png](imgs/absCls1.png)
+
+Abstract classes in TypeScript are used to define a base class that cannot be instantiated directly. They are useful for creating a common blueprint for derived classes, ensuring that certain methods and properties are implemented by all subclasses.
+
+### Key Points:
+- **Cannot be instantiated**: Abstract classes cannot be instantiated directly.
+- **Common blueprint**: They provide a common structure for derived classes.
+- **Abstract methods**: They can contain abstract methods that must be implemented by derived classes.
+
+### Example:
+
+```typescript
+abstract class Animal {
+    constructor(public name: string) {}
+
+    abstract makeSound(): void;
+
+    move(): void {
+        console.log(`${this.name} is moving.`);
+    }
+}
+
+class Dog extends Animal {
+    makeSound(): void {
+        console.log("Bark");
+    }
+}
+
+class Cat extends Animal {
+    makeSound(): void {
+        console.log("Meow");
+    }
+}
+
+// For this function, we create an abstract class
+const animal = new Animal(); // Error: Cannot create an instance of an abstract class.
+animal.move(); // Error: Cannot create an instance of an abstract class.
+
+const dog = new Dog("Buddy");
+dog.makeSound(); // Bark
+dog.move(); // Buddy is moving.
+
+const cat = new Cat("Whiskers");
+cat.makeSound(); // Meow
+cat.move(); // Whiskers is moving.
+```
+
+In this example, `Animal` is an abstract class with an abstract method `makeSound`. The `Dog` and `Cat` classes extend `Animal` and provide their own implementations of the `makeSound` method. This ensures that all subclasses of `Animal` implement the `makeSound` method, providing a consistent interface.
+
+Ex2:
+
+```ts
+abstract class Shape {
+    constructor(public color: string) {
+    }
+
+    // render the shape
+    abstract render(): void;
+}
+
+class Circle extends Shape {
+    constructor(public radius: number, color: string) {
+        super(color);
+    }
+
+    override render(): void {
+        console.log("Rendering Circle...");
+    }
+}
+
+const circle = new Circle(10, "red")
+console.log(circle)
+```
+
+## Interfaces
+
+Classes - Blueprint for creating objects
+
+Interfaces - to define the shape of objects
+
+Interfaces in TypeScript are used to define the shape of an object. They specify the properties and methods that an object must have, but do not provide implementations. Interfaces are a way to enforce a contract on a class or an object, ensuring that it adheres to a specific structure.
+
+### Key Points:
+- **Type Checking**: Interfaces are used for type checking at compile time.
+- **No Implementation**: Interfaces do not contain any implementation.
+- **Optional Properties**: Properties can be marked as optional using the `?` symbol.
+- **Readonly Properties**: Properties can be marked as readonly using the `readonly` keyword.
+- **Extending Interfaces**: Interfaces can extend other interfaces, allowing for the creation of complex types.
+
+### Example:
+
+```typescript
+interface Person {
+    firstName: string;
+    lastName: string;
+    age?: number; // Optional property
+    readonly id: number; // Readonly property
+    getFullName(): string;
+}
+
+class Student implements Person {
+    constructor(
+        public firstName: string,
+        public lastName: string,
+        public id: number,
+        public age?: number
+    ) {}
+
+    getFullName(): string {
+        return `${this.firstName} ${this.lastName}`;
+    }
+}
+
+const student: Person = new Student("John", "Doe", 1, 20);
+console.log(student.getFullName()); // John Doe
+```
+
+In this example, the `Person` interface defines the structure that a `Person` object must have. The `Student` class implements the `Person` interface, ensuring that it has all the properties and methods defined in the interface.
+
+```ts
+// abstract class Calender{
+//     constructor(public name: string) {
+//     }
+//
+//     abstract addEvent(): void;
+//     abstract removeEvent(): void;
+// }
+
+// More clean and concise
+interface Calender {
+    name: string;
+    addEvent(): void;
+    removeEvent(): void;
+}
+
+interface CloudCalender extends Calender {
+    sync(): void;
+}
+
+class GoogleCalender implements Calender {
+   constructor(public name: string){}
+
+    addEvent(): void {
+    }
+
+    removeEvent(): void {
+    }
+
+}
+
+// Using an interface is more flexible than using an abstract class, and that's shape of an object.
+```
+
+
+## Interface vs Abstract class
+
+### Interface
+- **Purpose**: Defines a contract that classes can implement.
+- **Implementation**: Cannot provide any implementation, only method signatures and properties.
+- **Multiple Inheritance**: A class can implement multiple interfaces.
+- **Usage**: Used to define the shape of an object or to enforce a contract on a class.
+
+```typescript
+interface Person {
+    firstName: string;
+    lastName: string;
+    getFullName(): string;
+}
+
+class Student implements Person {
+    constructor(public firstName: string, public lastName: string) {}
+
+    getFullName(): string {
+        return `${this.firstName} ${this.lastName}`;
+    }
+}
+```
+
+### Abstract Class
+- **Purpose**: Serves as a base class that cannot be instantiated directly.
+- **Implementation**: Can provide both method signatures and implementations.
+- **Single Inheritance**: A class can extend only one abstract class.
+- **Usage**: Used to define a common blueprint for derived classes, ensuring certain methods and properties are implemented.
+
+```typescript
+abstract class Animal {
+    constructor(public name: string) {}
+
+    abstract makeSound(): void;
+
+    move(): void {
+        console.log(`${this.name} is moving.`);
+    }
+}
+
+class Dog extends Animal {
+    makeSound(): void {
+        console.log("Bark");
+    }
+}
+```
+
+### Key Differences
+- **Interfaces** cannot have any implementation, while **abstract classes** can have both abstract methods (without implementation) and concrete methods (with implementation).
+- A class can implement multiple **interfaces**, but it can extend only one **abstract class**.
+- **Interfaces** are used to define the shape of an object, while **abstract classes** are used to provide a common base class with shared functionality.
+
+## Interfaces vs Types
+
+In TypeScript, interfaces and type aliases can be used interchangeably.
+
+Both can be used to describe the shape of an object:
+
+Interface
+
+```ts
+interface Person {
+    name: string;
+}
+
+let person: Person = {
+    name: 'Mosh',
+};
+```
+
+Type
+```ts
+
+type Person = {
+    name: string;
+};
+
+let person: Person = {
+    name: 'Mosh',
+};
+```
+
+A class can also implement an interface or a type alias:
+
+```ts
+class MyCalendar extends MyInterface {}  
+class MyCalendar extends MyType {}
+```
+It’s more conventional to use an interface in front of the extends keyword, though. 
+
+
+## Exercises
+
+```ts
+class Logger {
+    constructor(public logFile: string) {
+    }
+    
+    log(message: string){
+    }
+}
+
+class Person {
+    constructor(public firstName: string, public lastName: string) {
+    }
+    
+    get fullName(){
+        return `${this.firstName} ${this.lastName}`;
+    }
+}
+
+class Employee extends Person{
+    constructor(public salary: number, firstName:string, lastName:string) {
+        super(firstName, lastName);
+    }
+}
+
+// Protected can be inherited by child classes but not private.
+
+interface Employee {
+    name: string;
+    salary: number;
+    address: Address
+}
+
+interface Address {
+    street: string;
+    city: string;
+    zipCode: number;
+    
+}
+```
+
+
+# Generics
