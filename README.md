@@ -31,8 +31,19 @@
    11. [Polymorphism](#polymorphism)
    12. [Open-Closed Principle](#open-closed-principle)
    13. [SOLID Principles](#solid-principles)
-   14. [Private and Protected Members](#private-and-protected-members)
-   
+   14. [Private vs Protected Members](#private-vs-protected-members
+   15. [Abstract Classes and methods](#abstract-classes-and-methods)
+   16. [Interfaces](#interfaces)
+   17. [Interface vs Abstract class](#interface-vs-abstract-class)
+       18. [Interface](#interface)
+       19. [Abstract Class](#abstract-class)
+   20. [Interfaces vs Types](#interfaces-vs-types)
+4. [Generics](#generics)
+   1. [Generic Classes](#generic-classes)
+   2. [Generic Functions](#generic-functions)
+   3. [Generic Constraints](#generic-constraints)
+   4. [Generic Utility Types](#generic-utility-types)
+
 
 # TypeScript
 
@@ -1719,3 +1730,124 @@ interface Address {
 
 
 # Generics
+![img.png](imgs/GenCont.png)
+
+## Understanding the problem
+
+```ts
+class KeyValuePair {
+   constructor(public key: number, public value: string) {
+   }
+}
+
+class StringValuePair {
+    constructor(public key: string, public value: string) {
+    }
+}
+
+let pair = new KeyValuePair(1, "First");
+// pair.key.
+
+let pair2 = new StringValuePair("First", "John");
+// pair2.key.
+
+// so we need to create multiple classes for this. To avoid this, generics here for the rescue
+
+
+```
+----
+## Generic classes
+
+Generic classes in TypeScript allow you to create classes that can work with a variety of data types without specifying the exact type at the time of class definition. This provides flexibility and reusability.
+
+Generic classes in TypeScript same as, Template classes in C++
+
+### Key Points:
+- **Type Parameters**: Generic classes use type parameters (e.g., `<T>`) to define the types they will work with.
+- **Type Safety**: They ensure type safety by allowing you to specify the type when creating an instance of the class.
+- **Reusability**: They can be reused with different types without rewriting the class.
+
+### Example:
+
+Here is an example of a generic class `DataStore` that can store and retrieve data of any type:
+
+```typescript
+class DataStore<T> {
+    private data: T[] = [];
+
+    addItem(item: T): void {
+        this.data.push(item);
+    }
+
+    getItem(index: number): T {
+        return this.data[index];
+    }
+}
+
+// Using the generic class with different types
+const stringStore = new DataStore<string>();
+stringStore.addItem("Hello");
+console.log(stringStore.getItem(0)); // Output: Hello
+
+const numberStore = new DataStore<number>();
+numberStore.addItem(42);
+console.log(numberStore.getItem(0)); // Output: 42
+```
+
+In this example, `DataStore` is a generic class with a type parameter `T`. It can store and retrieve items of any type specified when creating an instance of the class.
+
+Ex2:
+
+```ts
+class KeyValuePair<K,V> {
+   constructor(public key: K, public value: V) {}
+}
+
+let pair = new KeyValuePair<string, string>("1", "First");
+// pair.value.  // can see the string properties
+
+// we can leave as it is, so it can infer the type from the value
+let pair2 = new KeyValuePair(1, "First");
+// pair2.value. // can see the number properties
+```
+
+## Generic functions
+
+Inside classes we dont use functions keyword.
+
+Step 1
+```ts
+function WrapInArray(value: number) {
+    return [value];
+}
+
+let numbers = WrapInArray(1);
+console.log(numbers); // [1]
+```
+
+Step 2
+```ts
+function WrapInArray<T>(value: T) {
+    return [value];
+}
+
+let numbers = WrapInArray("1");
+console.log(numbers); // [1]
+```
+
+Step 3:
+
+```ts
+class ArrayUtils {
+   static WrapInArray<T>(value: T) {
+      return [value];
+   }
+
+}
+
+let numbers = ArrayUtils.WrapInArray(1)
+// Inside classes we dont use functions keyword.
+  
+```
+
+## Generic Interfaces
